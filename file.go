@@ -339,12 +339,10 @@ func (a *Authorize) FileUpload(option *FileOption) (result FileInfo, err error) 
 	defer option.OpenFile.Close()
 
 	//获取文件分片信息
-	partInfo, err := SplitFile(option.OpenFile)
+	option.PartInfoList, err = SplitFile(option)
 	if err != nil {
 		return result, err
 	}
-
-	option.PartInfoList = partInfo
 
 	//创建文件
 	creatResp, err := a.FileCreate(option)
@@ -355,7 +353,7 @@ func (a *Authorize) FileUpload(option *FileOption) (result FileInfo, err error) 
 	//上传文件(串行)
 	httpClient := new(http.Client)
 	for index, part := range creatResp.PartInfoList {
-		size := partInfo[index].ParallelSha1Ctx.PartSize
+		size := option.PartInfoList[index].ParallelSha1Ctx.PartSize
 		req, err := http.NewRequest("PUT", part.UploadUrl, io.LimitReader(option.OpenFile, size))
 		if err != nil {
 			return result, err

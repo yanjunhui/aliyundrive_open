@@ -11,17 +11,7 @@ import (
 	"time"
 )
 
-var client *aliyundrive_open.Client
-
-const (
-	// 阿里的同学看到, 如果可以, 也联系我(i@yanjunhui.com), 提供一个测试应用权限
-	ClientID     = "11111"
-	ClientSecret = "11111"
-)
-
-func init() {
-	client = aliyundrive_open.NewClient(ClientID, ClientSecret)
-}
+var client = aliyundrive_open.NewClient("ClientID", "ClientSecret")
 
 // GetQRCode 获取登录二维码. 直接打开返回的 qrCodeUrl 就可以看到二维码.
 // sid 参数用于后续 QrCodeStatus 方法获取扫码状态
@@ -50,7 +40,7 @@ func RefreshToken(refreshToken string) (result aliyundrive_open.Authorize, err e
 }
 
 // 完整的登录授权流程
-func Login() (result aliyundrive_open.Authorize, err error) {
+func LoginQRCode() (result aliyundrive_open.Authorize, err error) {
 	//1. 获取登录二维码
 	qrCode, err := GetQRCode()
 	if err != nil {
@@ -135,7 +125,7 @@ func GetDriveInfo(authorize aliyundrive_open.Authorize) {
 
 // GetDrivesSpace 获取空间使用情况
 func GetDrivesSpace(authorize aliyundrive_open.Authorize) {
-	driveSpace, err := authorize.DrivesSpace()
+	driveSpace, err := authorize.DriveSpace()
 	if err != nil {
 		log.Printf("获取云盘空间使用情况失败: %s\n", err)
 		return
@@ -312,6 +302,7 @@ func UploadFile(authorize aliyundrive_open.Authorize, filePath string) (uploadRe
 
 	// 上传文件
 	option := aliyundrive_open.NewFileUploadOption(authorize.DriveID, "root", name, file)
+	option.SetParallelUpload(true)
 	uploadResult, err = authorize.FileUpload(option)
 	if err != nil {
 		log.Printf("上传文件失败: %s\n", err)
@@ -321,5 +312,5 @@ func UploadFile(authorize aliyundrive_open.Authorize, filePath string) (uploadRe
 }
 
 func main() {
-	Login()
+	LoginQRCode()
 }

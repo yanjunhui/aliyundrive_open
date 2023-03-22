@@ -57,8 +57,8 @@ type SpaceInfo struct {
 	ErrorInfo
 }
 
-// DrivesSpace 获取云盘空间信息
-func (a *Authorize) DrivesSpace() (result SpaceInfo, err error) {
+// DriveSpace 获取云盘空间信息
+func (a *Authorize) DriveSpace() (result SpaceInfo, err error) {
 	err = a.HttpPost(APISpaceInfo, nil, &result)
 	if err != nil {
 		return result, err

@@ -1,4 +1,4 @@
-module aliyundrive_open
+module github.com/yanjunhui/aliyundrive_open
 
 go 1.20
 
