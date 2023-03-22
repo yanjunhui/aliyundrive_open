@@ -286,12 +286,12 @@ func MoveFile(authorize aliyundrive_open.Authorize, fileID, parentID string) {
 ### 16. CopyFile 复制文件
 ```Go
 func CopyFile(authorize aliyundrive_open.Authorize, fileID, toParentID string) {
-option := aliyundrive_open.NewFileMoveAndCopyOption(authorize.DriveID, fileID, toParentID)
-_, err := authorize.FileCopy(option)
-if err != nil {
-log.Println(err)
-return
-}
+	option := aliyundrive_open.NewFileMoveAndCopyOption(authorize.DriveID, fileID, toParentID)
+	_, err := authorize.FileCopy(option)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	log.Printf("复制文件成功: %s\n", fileID)
 }
