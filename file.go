@@ -74,6 +74,10 @@ func (a *Authorize) FileList(option *FileOption) (result FileList, err error) {
 		option = NewFileListOption(a.DriveID, "root", "")
 	}
 
+	if option.ParentFileID == "" {
+		option.ParentFileID = "root"
+	}
+
 	err = a.HttpPost(APIList, option, &result)
 	if err != nil {
 		return result, err
