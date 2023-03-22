@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-resty/resty/v2"
-	"log"
 	"net/http"
 	"time"
 )
@@ -67,16 +66,12 @@ func HttpPost(url string, header http.Header, reqData interface{}, result interf
 	if header == nil {
 		header = http.Header{}
 	}
-
-	log.Printf("%s 请求数据: %+v\n", APIFileCreate, reqData)
-
+	
 	header.Set("Content-Type", "application/json;charset=UTF-8")
 	resp, err := r.SetHeaderMultiValues(header).Post(url)
 	if err != nil {
 		return errors.New("请求失败: " + err.Error())
 	}
-
-	log.Printf("%s 返回返回: %s\n", APIFileCreate, string(resp.Body()))
 
 	err = json.Unmarshal(resp.Body(), result)
 	if err != nil {

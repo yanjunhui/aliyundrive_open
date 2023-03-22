@@ -34,7 +34,7 @@ type FileInfo struct {
 	Name               string    `json:"name"`
 	ParentFileId       string    `json:"parent_file_id"`
 	PunishFlag         int       `json:"punish_flag,omitempty"`
-	Size               int       `json:"size,omitempty"`
+	Size               int64     `json:"size,omitempty"`
 	Starred            bool      `json:"starred"`
 	Status             string    `json:"status"`
 	Thumbnail          string    `json:"thumbnail,omitempty"`
