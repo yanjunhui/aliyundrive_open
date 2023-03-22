@@ -3,8 +3,8 @@
 package main
 
 import (
-	"aliyundrive_open"
 	"fmt"
+	"github.com/yanjunhui/aliyundrive_open"
 	"log"
 	"os"
 	"path/filepath"
