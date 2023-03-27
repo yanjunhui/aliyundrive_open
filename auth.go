@@ -2,6 +2,7 @@ package aliyundrive_open
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -21,7 +22,7 @@ func (s Scope) String() string {
 	return string(s)
 }
 
-// AuthorizeURL 构建登录授权页面. 需要一个回调地址接收 code
+// AuthorizeURL 构建 H5前端 授权页面. 需要一个回调地址接收 code
 // 拼接示例 https://openapi.aliyundrive.com/oauth/authorize?client_id=xxx&redirect_uri=xxx&scope=user:base,user:phone,file:all:read,file:all:write&state=xxx
 func (c *Client) AuthorizeURL(option *AuthorizeOption) (authURL string, err error) {
 	if option == nil {
@@ -38,6 +39,18 @@ func (c *Client) AuthorizeURL(option *AuthorizeOption) (authURL string, err erro
 	u.RawQuery = values.Encode()
 
 	return u.String(), nil
+}
+
+// ReceiveAuthorizeCode 接收前端授权 code, 并获得授权
+func (c *Client) ReceiveAuthorizeCode(req *http.Request) (result Authorize, err error) {
+	queryParams := req.URL.Query()
+
+	code := queryParams.Get("code")
+	if code == "" {
+		err = fmt.Errorf("code 为空")
+		return result, err
+	}
+	return c.Authorize(code)
 }
 
 // AuthorizeQRCode 授权二维码数据
@@ -102,6 +115,8 @@ type Authorize struct {
 	DriveID      string    `json:"drive_id"`
 	ErrorInfo
 }
+
+//
 
 // Authorize 授权登录
 func (c *Client) Authorize(authCode string) (result Authorize, err error) {

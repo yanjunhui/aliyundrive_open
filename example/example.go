@@ -13,6 +13,45 @@ import (
 
 var client = aliyundrive_open.NewClient("ClientID", "ClientSecret")
 
+// MultipleAuthorize H5 多种方式登录示例
+func MultipleAuthorize() {
+
+	//拼接授权地址, 记得修改成自己的回调地址
+	option := aliyundrive_open.NewDefaultMultipleAuthorizeOption("https://testcallback.aliyundrive.com")
+
+	//这里需要注意, 请求参数中的 scope 与后台设置的应用权限一致
+	option.SetScopes([]aliyundrive_open.Scope{aliyundrive_open.ScopeBase, aliyundrive_open.ScopeRead, aliyundrive_open.ScopeWrite})
+
+	authURL, err := client.AuthorizeURL(option)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	fmt.Println("打开以下地址获取授权码")
+
+	fmt.Println(authURL)
+
+	/*
+		// 构建一个 authCode 接收服务接口(仅做示例, 实际使用时是要部署在回调地址, 对应服务器上的)
+		http.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
+			authorize, err := client.ReceiveAuthorizeCode(r)
+			if err != nil {
+				fmt.Fprintf(w, "授权失败: %s", err)
+				return
+			}
+			fmt.Fprintf(w, "登录授权成功\naccess_token: %s\n\nrefresh_token: %s\n driver_id: %s\n, 过期时间: %s\n", authorize.AccessToken, authorize.RefreshToken, authorize.DriveID, authorize.ExpiresTime.String())
+		})
+
+		err = http.ListenAndServe("0.0.0.0:80", nil)
+		if err != nil {
+			fmt.Printf("http server failed, err:%v\n", err)
+			return
+		}
+
+	*/
+}
+
 // GetQRCode 获取登录二维码. 直接打开返回的 qrCodeUrl 就可以看到二维码.
 // sid 参数用于后续 QrCodeStatus 方法获取扫码状态
 func GetQRCode() (result aliyundrive_open.AuthorizeQRCode, err error) {
@@ -302,7 +341,6 @@ func UploadFile(authorize aliyundrive_open.Authorize, filePath string) (uploadRe
 
 	// 上传文件
 	option := aliyundrive_open.NewFileUploadOption(authorize.DriveID, "root", name, file)
-	option.SetParallelUpload(true)
 	uploadResult, err = authorize.FileUpload(option)
 	if err != nil {
 		log.Printf("上传文件失败: %s\n", err)
@@ -312,5 +350,5 @@ func UploadFile(authorize aliyundrive_open.Authorize, filePath string) (uploadRe
 }
 
 func main() {
-	LoginQRCode()
+	MultipleAuthorize()
 }

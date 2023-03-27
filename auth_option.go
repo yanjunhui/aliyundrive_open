@@ -5,6 +5,8 @@ type AuthorizeOption struct {
 	ClientID     string  `json:"client_id"`              // 开放平台应用ID
 	ClientSecret string  `json:"client_secret"`          // 开放平台应用密钥
 	Scopes       []Scope `json:"scopes"`                 // 授权范围
+	Width        int     `json:"width,omitempty"`        // 二维码宽度
+	Height       int     `json:"height,omitempty"`       // 二维码高度
 	RedirectUri  string  `json:"redirect_uri,omitempty"` // 回调地址
 	State        string  `json:"state,omitempty"`        // 防止CSRF攻击
 }
@@ -57,5 +59,11 @@ func (option *AuthorizeOption) SetScopes(scopes []Scope) *AuthorizeOption {
 // SetState 设置防止CSRF攻击
 func (option *AuthorizeOption) SetState(state string) *AuthorizeOption {
 	option.State = state
+	return option
+}
+
+func (option *AuthorizeOption) SetWidthAndHeight(width, height int) *AuthorizeOption {
+	option.Width = width
+	option.Height = height
 	return option
 }
