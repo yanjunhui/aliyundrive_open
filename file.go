@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -333,8 +334,6 @@ func (a *Authorize) fileAndFolderCreate(option *FileOption) (result FileCreate, 
 	return result, err
 }
 
-const DefaultPartSize int64 = 1024 * 1024 * 64
-
 // FileUpload 上传文件
 func (a *Authorize) FileUpload(option *FileOption) (result FileInfo, err error) {
 	if option.OpenFile == nil {
@@ -343,7 +342,7 @@ func (a *Authorize) FileUpload(option *FileOption) (result FileInfo, err error) 
 	defer option.OpenFile.Close()
 
 	//获取文件分片信息
-	option.PartInfoList, err = SplitFile(option)
+	option.PartInfoList, err = splitFile(option.OpenFile)
 	if err != nil {
 		return result, err
 	}
@@ -354,7 +353,7 @@ func (a *Authorize) FileUpload(option *FileOption) (result FileInfo, err error) 
 		return result, err
 	}
 
-	//上传文件(串行)
+	//上传文件
 	httpClient := new(http.Client)
 	for index, part := range creatResp.PartInfoList {
 		size := option.PartInfoList[index].ParallelSha1Ctx.PartSize
@@ -482,4 +481,39 @@ func (a *Authorize) FileReplaceName(fileID, old, new string) error {
 
 func (f *FileInfo) IsDir() bool {
 	return f.Type == FileTypeFolder
+}
+
+const DefaultPartSize int64 = 1024 * 1024 * 64
+
+// splitFile 处理文件分片信息(串行)
+func splitFile(file *os.File) (partInfoList []FileUpdatePartInfo, err error) {
+
+	stat, err := file.Stat()
+	if err != nil {
+		return partInfoList, err
+	}
+
+	var partInfo = FileUpdatePartInfo{}
+	if stat.Size() <= DefaultPartSize {
+		partInfo.PartNumber = 1
+		partInfo.ParallelSha1Ctx.PartOffset = 0
+		partInfo.ParallelSha1Ctx.PartSize = stat.Size()
+		partInfoList = append(partInfoList, partInfo)
+		return partInfoList, nil
+	}
+
+	var n = stat.Size() / DefaultPartSize
+	var otherSize = stat.Size() % DefaultPartSize
+
+	for i := int64(0); i < n; i++ {
+		partInfo.PartNumber = i + 1
+		partInfo.ParallelSha1Ctx.PartOffset = i * DefaultPartSize
+		partInfo.ParallelSha1Ctx.PartSize = DefaultPartSize
+		if i == n-1 {
+			partInfo.ParallelSha1Ctx.PartSize = DefaultPartSize + otherSize
+		}
+		partInfoList = append(partInfoList, partInfo)
+	}
+
+	return partInfoList, nil
 }

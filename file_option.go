@@ -90,10 +90,10 @@ type FileOption struct {
 	VideoThumbnailWidth int64                `json:"video_thumbnail_width"` // 视频预览宽度 (目录/文件)
 	ImageThumbnailWidth int64                `json:"image_thumbnail_width"` // 视频预览图片宽度 (目录/文件)
 	Fields              string               `json:"fields"`                // 只返回指定字段 (目录)
-	ParallelUpload      bool                 `json:"parallel_upload"`       // Deprecated: 暂时不支持. 是否开启分片并行上传(上传)
-	PartInfoList        []FileUpdatePartInfo `json:"part_info_list"`        // 分片上传信息(上传)
-	OpenFile            *os.File             `json:"-"`                     // 文件流(上传)
-	UploadID            string               `json:"upload_id"`             // 上传ID(上传)
+	//ParallelUpload      bool                 `json:"parallel_upload"`       // Deprecated: 并发上传已经停止支持
+	PartInfoList []FileUpdatePartInfo `json:"part_info_list"` // 分片上传信息(上传)
+	OpenFile     *os.File             `json:"-"`              // 文件流(上传)
+	UploadID     string               `json:"upload_id"`      // 上传ID(上传)
 }
 
 // FileUpdatePartInfo 分片上传选项
@@ -300,12 +300,6 @@ func (option *FileOption) SetThumbnailWidth(width int64) *FileOption {
 // SetResponseFields 设置返回字段
 func (option *FileOption) SetResponseFields(fields []ResponseFieldName) *FileOption {
 	option.Fields = joinCustomString(fields, ",")
-	return option
-}
-
-// SetParallelUpload 设置是否开启分片上传
-func (option *FileOption) SetParallelUpload(parallelUpload bool) *FileOption {
-	option.ParallelUpload = parallelUpload
 	return option
 }
 
