@@ -116,8 +116,6 @@ type Authorize struct {
 	ErrorInfo
 }
 
-//
-
 // Authorize 授权登录
 func (c *Client) Authorize(authCode string) (result Authorize, err error) {
 	if authCode == "" {
@@ -170,6 +168,14 @@ func (c *Client) RefreshToken(refreshToken string) (result Authorize, err error)
 
 	if result.Code != "" {
 		err = fmt.Errorf("刷新授权失败: %s", result.Message)
+	}
+
+	if c.DriveID == "" {
+		info, err := result.DriveInfo()
+		if err != nil {
+			return result, err
+		}
+		c.DriveID = info.DefaultDriveId
 	}
 
 	result.ExpiresTime = time.Now().Add(time.Duration(result.ExpiresIn-60) * time.Second)
