@@ -1,5 +1,11 @@
 # aliyundrive_open
-阿里云盘开放平台接口
+
+
+## 方法列表
+
+https://pkg.go.dev/github.com/yanjunhui/aliyundrive_open
+
+## 简单示例
 
 ### 1. 生成一个客户端实例
 
@@ -332,21 +338,21 @@ func DeleteFile(authorize aliyundrive_open.Authorize, fileID string) (result ali
 ### 20. UploadFile 上传文件
 ```Go
 func UploadFile(authorize aliyundrive_open.Authorize, filePath string) (uploadResult aliyundrive_open.FileInfo, err error) {
-file, err := os.Open(filePath)
-if err != nil {
-log.Printf("打开文件失败: %s\n", err)
-return uploadResult, err
-}
+    file, err := os.Open(filePath)
+    if err != nil {
+     log.Printf("打开文件失败: %s\n", err)
+        return uploadResult, err
+    }
 
-_, name := filepath.Split(file.Name())
+    _, name := filepath.Split(file.Name())
 
-// 上传文件
-option := aliyundrive_open.NewFileUploadOption(authorize.DriveID, "root", name, file)
-uploadResult, err = authorize.FileUpload(option)
-if err != nil {
-log.Printf("上传文件失败: %s\n", err)
-}
+    // 上传文件
+    option := aliyundrive_open.NewFileUploadOption(authorize.DriveID, "root", name, file)
+    uploadResult, err = authorize.FileUpload(option)
+    if err != nil {
+        log.Printf("上传文件失败: %s\n", err)
+    }
 
-return uploadResult, err
+    return uploadResult, err
 }
 ```
