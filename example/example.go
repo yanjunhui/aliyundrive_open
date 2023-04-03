@@ -40,7 +40,7 @@ func MultipleAuthorize() {
 				fmt.Fprintf(w, "授权失败: %s", err)
 				return
 			}
-			fmt.Fprintf(w, "登录授权成功\naccess_token: %s\n\nrefresh_token: %s\n driver_id: %s\n, 过期时间: %s\n", authorize.AccessToken, authorize.RefreshToken, authorize.DriveID, authorize.ExpiresTime.String())
+			fmt.Fprintf(w, "登录授权成功\naccess_token: %s\n\nrefresh_token: %s\n driver_id: %s\n, 过期时间: %s\n", authorize.AccessToken, authorize.RefreshToken, authorize.ExpiresTime.String())
 		})
 
 		err = http.ListenAndServe("0.0.0.0:80", nil)
@@ -130,7 +130,7 @@ func LoginQRCode() (result aliyundrive_open.Authorize, err error) {
 		return result, err
 	}
 
-	log.Printf("登录授权成功\naccess_token: %s\n\nrefresh_token: %s\n driver_id: %s\n, 过期时间: %s\n", authorize.AccessToken, authorize.RefreshToken, authorize.DriveID, authorize.ExpiresTime.String())
+	log.Printf("登录授权成功\naccess_token: %s\n\nrefresh_token: %s\n driver_id: %s\n, 过期时间: %s\n", authorize.AccessToken, authorize.RefreshToken, authorize.ExpiresTime.String())
 
 	log.Printf("稍等 3 秒钟, 刷新 access_token\n")
 
@@ -180,7 +180,7 @@ func GetFileList(authorize aliyundrive_open.Authorize, parentID string) {
 	if parentID == "" {
 		parentID = "root"
 	}
-	option := aliyundrive_open.NewFileListOption(authorize.DriveID, parentID, "")
+	option := aliyundrive_open.NewFileListOption(parentID, "")
 	fileList, err := authorize.FileList(option)
 	if err != nil {
 		log.Printf("获取文件列表情况失败: %s\n", err)
@@ -192,7 +192,7 @@ func GetFileList(authorize aliyundrive_open.Authorize, parentID string) {
 
 // GetFileInfoByID 获取文件信息, 目录和文件都支持
 func GetFileInfoByID(authorize aliyundrive_open.Authorize, fileID string) (file aliyundrive_open.FileInfo, err error) {
-	option := aliyundrive_open.NewFileOption(authorize.DriveID, fileID)
+	option := aliyundrive_open.NewFileOption(fileID)
 	file, err = authorize.File(option)
 	if err != nil {
 		log.Printf("获取文件信息失败: %s\n", err)
@@ -205,7 +205,7 @@ func GetFileInfoByID(authorize aliyundrive_open.Authorize, fileID string) (file 
 
 // GetFileInfoByPath 根据完整路径获取文件信息(仅文件)
 func GetFileInfoByPath(authorize aliyundrive_open.Authorize, path string) (file aliyundrive_open.FileInfo, err error) {
-	option := aliyundrive_open.NewFileOptionByPath(authorize.DriveID, path)
+	option := aliyundrive_open.NewFileOptionByPath(path)
 	file, err = authorize.File(option)
 	if err != nil {
 		log.Printf("获取文件信息失败: %s\n", err)
@@ -220,7 +220,7 @@ func GetFileInfoByPath(authorize aliyundrive_open.Authorize, path string) (file 
 // 这里我们使用了 NewFilesOption 方法来生成请求选项. 其余个性化参数可以通过 Set 方法设置
 func GetFilesInfo(authorize aliyundrive_open.Authorize, ids []string) {
 
-	bOption := aliyundrive_open.NewFilesOption(authorize.DriveID, ids)
+	bOption := aliyundrive_open.NewFilesOption(ids)
 	bFiles, err := authorize.Files(bOption)
 	if err != nil {
 		log.Printf("批量获取文件信息失败: %s\n", err)
@@ -237,7 +237,7 @@ func GetFilesInfo(authorize aliyundrive_open.Authorize, ids []string) {
 
 // 获取文件下载地址
 func GetDownloadURL(authorize aliyundrive_open.Authorize, fileID string) {
-	option := aliyundrive_open.NewFileDownloadURLOption(authorize.DriveID, fileID)
+	option := aliyundrive_open.NewFileDownloadURLOption(fileID)
 	downInfo, err := authorize.FileDownloadURL(option)
 	if err != nil {
 		log.Printf("获取文件下载地址失败: %s\n", err)
@@ -249,7 +249,7 @@ func GetDownloadURL(authorize aliyundrive_open.Authorize, fileID string) {
 
 // RenameFile 重命名文件
 func RenameFile(authorize aliyundrive_open.Authorize, fileID string, newName string) {
-	option := aliyundrive_open.NewFileRenameOption(authorize.DriveID, fileID, newName)
+	option := aliyundrive_open.NewFileRenameOption(fileID, newName)
 	result, err := authorize.FileRename(option)
 	if err != nil {
 		log.Println(err)
@@ -261,7 +261,7 @@ func RenameFile(authorize aliyundrive_open.Authorize, fileID string, newName str
 
 // GetVideoPlayURL 获取视频播放地址
 func GetVideoPlayInfo(authorize aliyundrive_open.Authorize, fileID string) {
-	option := aliyundrive_open.NewFileVideoPlayInfoOption(authorize.DriveID, fileID)
+	option := aliyundrive_open.NewFileVideoPlayInfoOption(fileID)
 	result, err := authorize.FileVideoPlayInfo(option)
 	if err != nil {
 		log.Println(err)
@@ -284,7 +284,7 @@ func MoveFile(authorize aliyundrive_open.Authorize, fileID, parentID string) {
 
 	log.Printf("移动前文件 %s(%s) 父目录ID: %s\n", file.Name, file.FileId, file.ParentFileId)
 
-	option := aliyundrive_open.NewFileMoveAndCopyOption(authorize.DriveID, fileID, parentID)
+	option := aliyundrive_open.NewFileMoveAndCopyOption(fileID, parentID)
 	_, err = authorize.FileMove(option)
 	if err != nil {
 		log.Println(err)
@@ -302,7 +302,7 @@ func MoveFile(authorize aliyundrive_open.Authorize, fileID, parentID string) {
 
 // CopyFile 复制文件
 func CopyFile(authorize aliyundrive_open.Authorize, fileID, toParentID string) {
-	option := aliyundrive_open.NewFileMoveAndCopyOption(authorize.DriveID, fileID, toParentID)
+	option := aliyundrive_open.NewFileMoveAndCopyOption(fileID, toParentID)
 	_, err := authorize.FileCopy(option)
 	if err != nil {
 		log.Println(err)
@@ -314,7 +314,7 @@ func CopyFile(authorize aliyundrive_open.Authorize, fileID, toParentID string) {
 
 // CreateFolder 创建目录
 func CreateFolder(authorize aliyundrive_open.Authorize, parentID, folderName string) (result aliyundrive_open.FileCreate, err error) {
-	option := aliyundrive_open.NewFileCreateOption(authorize.DriveID, "root", "新目录")
+	option := aliyundrive_open.NewFileCreateOption("root", "新目录")
 	result, err = authorize.FolderCreate(option)
 	if err != nil {
 		log.Printf("Token 刷新失败: %s\n", err)
@@ -324,7 +324,7 @@ func CreateFolder(authorize aliyundrive_open.Authorize, parentID, folderName str
 
 // TrashFile 将文件移入回收站
 func TrashFile(authorize aliyundrive_open.Authorize, fileID string) (result aliyundrive_open.FileMoveCopyDelTask, err error) {
-	option := aliyundrive_open.NewFileTrashAndDeleteOption(authorize.DriveID, fileID)
+	option := aliyundrive_open.NewFileTrashAndDeleteOption(fileID)
 	result, err = authorize.FileTrash(option)
 	if err != nil {
 		log.Printf("Token 刷新失败: %s\n", err)
@@ -334,7 +334,7 @@ func TrashFile(authorize aliyundrive_open.Authorize, fileID string) (result aliy
 
 // 彻底删除文件
 func DeleteFile(authorize aliyundrive_open.Authorize, fileID string) (result aliyundrive_open.FileMoveCopyDelTask, err error) {
-	option := aliyundrive_open.NewFileTrashAndDeleteOption(authorize.DriveID, fileID)
+	option := aliyundrive_open.NewFileTrashAndDeleteOption(fileID)
 	result, err = authorize.FileDelete(option)
 	if err != nil {
 		log.Printf("Token 刷新失败: %s\n", err)
@@ -353,7 +353,7 @@ func UploadFile(authorize aliyundrive_open.Authorize, filePath string) (uploadRe
 	_, name := filepath.Split(file.Name())
 
 	// 上传文件
-	option := aliyundrive_open.NewFileUploadOption(authorize.DriveID, "root", name, file)
+	option := aliyundrive_open.NewFileUploadOption("root", name, file)
 	uploadResult, err = authorize.FileUpload(option)
 	if err != nil {
 		log.Printf("上传文件失败: %s\n", err)

@@ -1,5 +1,10 @@
 # aliyundrive_open
+终于有内测权限了, 开心!
+可以参考我另外一个基于 aliyundrive_open 完成的项目:
 
+https://github.com/yanjunhui/aliyundrive_webdav
+
+代码比较简陋, 抛砖引玉, 有兴趣的可以一起完善
 
 ## 方法列表
 

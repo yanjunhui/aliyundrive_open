@@ -72,8 +72,9 @@ type FileInfo struct {
 // FileList  获取文件列表
 func (a *Authorize) FileList(option *FileOption) (result FileList, err error) {
 	if option == nil {
-		option = NewFileListOption(a.DriveID, "root", "")
+		option = NewFileListOption("root", "")
 	}
+	option.SetDriveID(a.DriveID)
 
 	if option.ParentFileID == "" {
 		option.ParentFileID = "root"
@@ -97,6 +98,8 @@ func (a *Authorize) File(option *FileOption) (result FileInfo, err error) {
 		return result, fmt.Errorf("option is nil")
 	}
 
+	option.SetDriveID(a.DriveID)
+
 	err = a.HttpPost(APIFile, option, &result)
 	if err != nil {
 		return result, err
@@ -110,13 +113,17 @@ func (a *Authorize) File(option *FileOption) (result FileInfo, err error) {
 }
 
 // Files 批量获取文件信息
-func (a *Authorize) Files(option []*FileOption) (result FileList, err error) {
-	if len(option) == 0 {
-		return result, fmt.Errorf("option is nil")
+func (a *Authorize) Files(options []*FileOption) (result FileList, err error) {
+	if len(options) == 0 {
+		return result, fmt.Errorf("options is nil")
+	}
+
+	for index, _ := range options {
+		options[index].SetDriveID(a.DriveID)
 	}
 
 	err = a.HttpPost(APIFiles, map[string][]*FileOption{
-		"file_list": option,
+		"file_list": options,
 	}, &result)
 	if err != nil {
 		return result, err
@@ -142,6 +149,8 @@ func (a *Authorize) FileDownloadURL(option *FileOption) (result FileDownloadURL,
 		return result, fmt.Errorf("option is nil")
 	}
 
+	option.SetDriveID(a.DriveID)
+
 	err = a.HttpPost(APIFileDownload, option, &result)
 	if err != nil {
 		return result, err
@@ -159,6 +168,8 @@ func (a *Authorize) FileRename(option *FileOption) (result FileInfo, err error) 
 	if option == nil {
 		return result, fmt.Errorf("option is nil")
 	}
+
+	option.SetDriveID(a.DriveID)
 
 	err = a.HttpPost(APIFileUpdate, option, &result)
 	if err != nil {
@@ -197,6 +208,9 @@ type FileVideoPlayInfo struct {
 
 // FileVideoPlayInfo 获取视频转码播放信息
 func (a *Authorize) FileVideoPlayInfo(option *FileOption) (result FileVideoPlayInfo, err error) {
+
+	option.SetDriveID(a.DriveID)
+
 	err = a.HttpPost(APIFileVideoPlayInfo, option, &result)
 	if err != nil {
 		return result, err
@@ -229,6 +243,9 @@ func (a *Authorize) FileCopy(option *FileOption) (result FileMoveCopyDelTask, er
 
 // FileMoveAndCopy  移动/复制文件
 func (a *Authorize) FileMoveAndCopy(option *FileOption, isMove bool) (result FileMoveCopyDelTask, err error) {
+
+	option.SetDriveID(a.DriveID)
+
 	file, err := a.File(option)
 	if err != nil {
 		return result, err
@@ -307,12 +324,18 @@ type FileCreate struct {
 
 // FileCreate 创建文件
 func (a *Authorize) FileCreate(option *FileOption) (result FileCreate, err error) {
+
+	option.SetDriveID(a.DriveID)
+
 	option.SetType(FileTypeFile)
 	return a.fileAndFolderCreate(option)
 }
 
 // FolderCreate 创建目录
 func (a *Authorize) FolderCreate(option *FileOption) (result FileCreate, err error) {
+
+	option.SetDriveID(a.DriveID)
+
 	option.SetType(FileTypeFolder)
 	return a.fileAndFolderCreate(option)
 }
@@ -320,7 +343,7 @@ func (a *Authorize) FolderCreate(option *FileOption) (result FileCreate, err err
 // fileAndFolderCreate 创建文件和目录
 func (a *Authorize) fileAndFolderCreate(option *FileOption) (result FileCreate, err error) {
 
-	log.Printf("创建文件选项信息: %+v\n", option)
+	option.SetDriveID(a.DriveID)
 
 	err = a.HttpPost(APIFileCreate, option, &result)
 	if err != nil {
@@ -340,6 +363,8 @@ func (a *Authorize) FileUpload(option *FileOption) (result FileInfo, err error) 
 		return result, fmt.Errorf("OpenFile is nil")
 	}
 	defer option.OpenFile.Close()
+
+	option.SetDriveID(a.DriveID)
 
 	//获取文件分片信息
 	option.PartInfoList, err = splitFile(option.OpenFile)
@@ -395,6 +420,8 @@ func (a *Authorize) FileTrash(option *FileOption) (result FileMoveCopyDelTask, e
 		return result, fmt.Errorf("option is nil")
 	}
 
+	option.SetDriveID(a.DriveID)
+
 	err = a.HttpPost(APIFileTrash, option, &result)
 	if err != nil {
 		return result, err
@@ -413,6 +440,8 @@ func (a *Authorize) FileDelete(option *FileOption) (result FileMoveCopyDelTask, 
 		return result, fmt.Errorf("option is nil")
 	}
 
+	option.SetDriveID(a.DriveID)
+
 	err = a.HttpPost(APIFileDelete, option, &result)
 	if err != nil {
 		return result, err
@@ -429,7 +458,8 @@ func (a *Authorize) FileDelete(option *FileOption) (result FileMoveCopyDelTask, 
 func (a *Authorize) FileReplaceName(fileID, old, new string) error {
 
 	//查询文件信息
-	fileOption := NewFileOption(a.DriveID, fileID)
+	fileOption := NewFileOption(fileID)
+	fileOption.SetDriveID(a.DriveID)
 	file, err := a.File(fileOption)
 	if err != nil {
 		return err
@@ -438,7 +468,8 @@ func (a *Authorize) FileReplaceName(fileID, old, new string) error {
 	errFileIDs := make([]string, 0)
 	if file.IsDir() {
 		marker := "first"
-		listOption := NewFileListOption(a.DriveID, fileID, "")
+		listOption := NewFileListOption(fileID, "")
+		listOption.SetDriveID(a.DriveID)
 		for marker != "" {
 			if marker == "first" {
 				marker = ""
@@ -453,7 +484,8 @@ func (a *Authorize) FileReplaceName(fileID, old, new string) error {
 			for _, f := range list.Items {
 				if strings.Contains(f.Name, old) {
 					newName := strings.Replace(f.Name, old, new, -1)
-					option := NewFileRenameOption(a.DriveID, f.FileId, newName)
+					option := NewFileRenameOption(f.FileId, newName)
+					option.SetDriveID(a.DriveID)
 					_, err := a.FileRename(option)
 					if err != nil {
 						errFileIDs = append(errFileIDs, strings.Join([]string{f.FileId, err.Error()}, ":"))
@@ -471,7 +503,8 @@ func (a *Authorize) FileReplaceName(fileID, old, new string) error {
 
 	if strings.Contains(file.Name, old) {
 		newName := strings.Replace(file.Name, old, new, -1)
-		option := NewFileRenameOption(a.DriveID, fileID, newName)
+		option := NewFileRenameOption(fileID, newName)
+		option.SetDriveID(a.DriveID)
 		_, err := a.FileRename(option)
 		return err
 	}

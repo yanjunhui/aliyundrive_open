@@ -13,11 +13,12 @@ type AuthorizeOption struct {
 
 // NewDefaultMultipleAuthorizeOption 创建默认授权选项
 // 网页多种登录方式, 回调地址为必传,否则无法接收code.如无法满足条件,请使用使用 "单一扫码方式"
+// 默认参数取消掉手机号权限(如果有需要, 请单独设置)
 func NewDefaultMultipleAuthorizeOption(redirectUri string) *AuthorizeOption {
 	return &AuthorizeOption{
 		Scopes: []Scope{
 			ScopeBase,
-			ScopePhone,
+			//ScopePhone,
 			ScopeRead,
 			ScopeWrite,
 		},
@@ -27,11 +28,12 @@ func NewDefaultMultipleAuthorizeOption(redirectUri string) *AuthorizeOption {
 }
 
 // NewDefaultSingleAuthorizeOption 创建默认单一扫码方式授权选项
+// 默认参数取消掉手机号权限(如果有需要, 请单独设置)
 func NewDefaultSingleAuthorizeOption() *AuthorizeOption {
 	return &AuthorizeOption{
 		Scopes: []Scope{
 			ScopeBase,
-			ScopePhone,
+			//ScopePhone
 			ScopeRead,
 			ScopeWrite,
 		},
