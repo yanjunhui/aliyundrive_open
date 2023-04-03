@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	APIBase = "https://open.aliyundrive.com"
+	APIBase = "https://openapi.aliyundrive.com"
 
 	//用户权限相关
-	APIAuthorizeMultiple     = "https://openapi.aliyundrive.com/oauth/authorize" //多种授权方式
-	APIAuthorizeQrCode       = APIBase + "/oauth/authorize/qrcode"               //获取二维码, 仅支持扫码登录
-	APIAuthorizeQrCodeStatus = APIBase + "/oauth/qrcode/%s/status"               //获取扫码结果
-	APIRefreshToken          = APIBase + "/oauth/access_token"                   //刷新 access_token
-	APIDriveInfo             = APIBase + "/adrive/v1.0/user/getDriveInfo"        //获取用户云盘信息
-	APISpaceInfo             = APIBase + "/adrive/v1.0/user/getSpaceInfo"        //获取空间大小信息
+	APIAuthorizeMultiple     = APIBase + "/oauth/authorize"               //多种授权方式
+	APIAuthorizeQrCode       = APIBase + "/oauth/authorize/qrcode"        //获取二维码, 仅支持扫码登录
+	APIAuthorizeQrCodeStatus = APIBase + "/oauth/qrcode/%s/status"        //获取扫码结果
+	APIRefreshToken          = APIBase + "/oauth/access_token"            //刷新 access_token
+	APIDriveInfo             = APIBase + "/adrive/v1.0/user/getDriveInfo" //获取用户云盘信息
+	APISpaceInfo             = APIBase + "/adrive/v1.0/user/getSpaceInfo" //获取空间大小信息
 
 	//文件操作相关
 	APIList              = APIBase + "/adrive/v1.0/openFile/list"                    //获取文件列表
@@ -66,7 +66,7 @@ func HttpPost(url string, header http.Header, reqData interface{}, result interf
 	if header == nil {
 		header = http.Header{}
 	}
-	
+
 	header.Set("Content-Type", "application/json;charset=UTF-8")
 	resp, err := r.SetHeaderMultiValues(header).Post(url)
 	if err != nil {

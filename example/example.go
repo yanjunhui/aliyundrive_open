@@ -190,9 +190,22 @@ func GetFileList(authorize aliyundrive_open.Authorize, parentID string) {
 	log.Printf("获取文件列表成功, 文件数量: %d\n", len(fileList.Items))
 }
 
-// GetFileInfo 获取文件信息, 目录和文件都支持
-func GetFileInfo(authorize aliyundrive_open.Authorize, fileID string) (file aliyundrive_open.FileInfo, err error) {
+// GetFileInfoByID 获取文件信息, 目录和文件都支持
+func GetFileInfoByID(authorize aliyundrive_open.Authorize, fileID string) (file aliyundrive_open.FileInfo, err error) {
 	option := aliyundrive_open.NewFileOption(authorize.DriveID, fileID)
+	file, err = authorize.File(option)
+	if err != nil {
+		log.Printf("获取文件信息失败: %s\n", err)
+		return
+	}
+
+	log.Printf("文件ID: %s 名称: %s, 类型: %s 大小: %d\n", file.FileId, file.Name, file.Type, file.Size)
+	return file, err
+}
+
+// GetFileInfoByPath 根据完整路径获取文件信息(仅文件)
+func GetFileInfoByPath(authorize aliyundrive_open.Authorize, path string) (file aliyundrive_open.FileInfo, err error) {
+	option := aliyundrive_open.NewFileOptionByPath(authorize.DriveID, path)
 	file, err = authorize.File(option)
 	if err != nil {
 		log.Printf("获取文件信息失败: %s\n", err)
@@ -263,7 +276,7 @@ func GetVideoPlayInfo(authorize aliyundrive_open.Authorize, fileID string) {
 // MoveFile 移动文件
 func MoveFile(authorize aliyundrive_open.Authorize, fileID, parentID string) {
 
-	file, err := GetFileInfo(authorize, fileID)
+	file, err := GetFileInfoByID(authorize, fileID)
 	if err != nil {
 		log.Println(err)
 		return
@@ -278,7 +291,7 @@ func MoveFile(authorize aliyundrive_open.Authorize, fileID, parentID string) {
 		return
 	}
 
-	file, err = GetFileInfo(authorize, fileID)
+	file, err = GetFileInfoByID(authorize, fileID)
 	if err != nil {
 		log.Println(err)
 		return
@@ -347,8 +360,4 @@ func UploadFile(authorize aliyundrive_open.Authorize, filePath string) (uploadRe
 	}
 
 	return uploadResult, err
-}
-
-func main() {
-	MultipleAuthorize()
 }

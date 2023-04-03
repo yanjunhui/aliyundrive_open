@@ -2,6 +2,7 @@ package aliyundrive_open
 
 import (
 	"os"
+	"strings"
 )
 
 // OrderSortedField 排序字段
@@ -75,6 +76,7 @@ type FileOption struct {
 	ParentFileID        string               `json:"parent_file_id"`        // 目录ID(目录/必填)
 	FileID              string               `json:"file_id,omitempty"`     // 文件ID(文件必填)
 	Name                string               `json:"name"`                  // 文件名(重命名必填)
+	Path                string               `json:"path"`                  // 文件完整路径(不包括 /root)
 	ExpireSec           int64                `json:"expire_sec"`            // 下载链接有效期(链接必填)
 	URLExpireSec        int64                `json:"url_expire_sec"`        // 视频播放地址有效期(播放必填)
 	ToParentFileID      string               `json:"to_parent_file_id"`     // 移动到的目录ID(移动必填)
@@ -185,6 +187,14 @@ func NewFileOption(driveID, fileID string) *FileOption {
 	}
 }
 
+// NewFileOptionByPath 根据文件路径获取文件信息, 该接口暂为灰度测试接口
+func NewFileOptionByPath(driveID, path string) *FileOption {
+	return &FileOption{
+		DriveID: driveID,
+		Path:    path,
+	}
+}
+
 // NewFilesOption 创建获取多个文件默认参数
 func NewFilesOption(driveID string, fileIDs []string) (options []*FileOption) {
 	for _, id := range fileIDs {
@@ -203,6 +213,7 @@ func NewFileListOption(driveID, parentFileID, marker string) *FileOption {
 		OrderDirection: OrderSortedDirectionAsc,
 		Limit:          100,
 		URLExpireSec:   86400,
+		Fields:         "*",
 	}
 }
 
@@ -215,6 +226,12 @@ func (option *FileOption) SetParentFileID(parentFileID string) *FileOption {
 // SetFileID 设置文件ID
 func (option *FileOption) SetFileID(fileID string) *FileOption {
 	option.FileID = fileID
+	return option
+}
+
+// SetFilePath 设置文件ID
+func (option *FileOption) SetFilePath(path string) *FileOption {
+	option.Path = path
 	return option
 }
 
@@ -287,6 +304,12 @@ func (option *FileOption) SetType(fileType FileType) *FileOption {
 // SetVideoThumbnailTime 设置视频预览时间
 func (option *FileOption) SetVideoThumbnailTime(time int64) *FileOption {
 	option.VideoThumbnailTime = time
+	return option
+}
+
+// SetFields 设置返回字段
+func (option *FileOption) SetFields(fields []string) *FileOption {
+	option.Fields = strings.Join(fields, ",")
 	return option
 }
 
