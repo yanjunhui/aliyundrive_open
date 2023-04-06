@@ -54,7 +54,12 @@ func NewSingleAuthorizeOption() *AuthorizeOption {
 
 // SetScopes 设置授权范围
 func (option *AuthorizeOption) SetScopes(scopes []Scope) *AuthorizeOption {
-	option.Scopes = scopes
+	if len(scopes) == 0 {
+		option.Scopes = scopes
+	} else {
+		option.Scopes = append(option.Scopes, scopes...)
+	}
+
 	return option
 }
 

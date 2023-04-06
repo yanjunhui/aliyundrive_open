@@ -180,7 +180,7 @@ func NewFileOption(fileID string) *FileOption {
 	}
 }
 
-// NewFileOptionByPath 根据文件路径获取文件信息, 该接口暂为灰度测试接口
+// NewFileOptionByPath 根据文件路径获取文件信息
 func NewFileOptionByPath(path string) *FileOption {
 	return &FileOption{
 		Path: path,
