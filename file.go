@@ -54,14 +54,14 @@ type FileInfo struct {
 			CodeName      string `json:"code_name"`
 			Duration      string `json:"duration"`
 			SampleRate    string `json:"sample_rate"`
-		} `json:"video_media_audio_stream"`
+		} `json:"video_media_audio_stream,omitempty"`
 		VideoMediaVideoStream []struct {
 			Bitrate  string `json:"bitrate"`
 			Clarity  string `json:"clarity"`
 			CodeName string `json:"code_name"`
 			Duration string `json:"duration"`
 			Fps      string `json:"fps"`
-		} `json:"video_media_video_stream"`
+		} `json:"video_media_video_stream,omitempty"`
 		Width int `json:"width"`
 	} `json:"video_media_metadata,omitempty"`
 	ExFieldsInfo struct {
